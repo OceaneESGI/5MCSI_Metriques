@@ -1,56 +1,52 @@
-<html>
-  <head>
-    <meta charset="UTF-8" />
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graphique des Commits</title>
+
+    <!-- Inclure la bibliothèque Google Charts -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  </head>
-  <body>
-    <h2>Graphique des Commits Par Minute</h2>
-    <div id="chart_div"></div>
-    <script>
-      google.charts.load('current', { packages: ['corechart', 'line'] });
-      google.charts.setOnLoadCallback(drawChart);
+    <script type="text/javascript">
+        // Charger le package "corechart" et "line" de Google Charts
+        google.charts.load('current', {'packages':['corechart', 'line']});
 
-      function drawChart() {
-        // Récupérer les données des commits depuis l'API /commits/
-        fetch('/commits/')
-          .then(response => response.json())
-          .then(data => {
-            var dataArray = [];
-            // Ajouter l'en-tête du tableau
-            dataArray.push(['Minute', 'Nombre de Commits']);
+        google.charts.setOnLoadCallback(drawChart); // Appeler la fonction drawChart une fois les bibliothèques chargées
 
-            // Remplir le tableau avec les données
-            for (var minute in data) {
-              dataArray.push([minute, data[minute]]);
-            }
+        function drawChart() {
+            // Faire une requête pour récupérer les données des commits
+            fetch('/commits_data/')  // Nouvelle route qui renverra les données des commits
+                .then(response => response.json())  // Récupérer les données JSON
+                .then(data => {
+                    var dataArray = [];
+                    dataArray.push(['Minute', 'Nombre de Commits']); // Ajouter les en-têtes
 
-            // Créer un tableau Google Visualization
-            var dataTable = google.visualization.arrayToDataTable(dataArray);
+                    // Ajouter les données dans le tableau de manière itérative
+                    for (var minute in data) {
+                        dataArray.push([minute, data[minute]]);
+                    }
 
-            // Définir les options du graphique (graphique sous forme de courbe)
-            var options = {
-              title: 'Nombre de commits par minute',
-              chartArea: { width: '80%', height: '80%' },
-              hAxis: {
-                title: 'Minutes',
-                minValue: 0
-              },
-              vAxis: {
-                title: 'Nombre de commits'
-              },
-              // Définir le type de graphique comme une courbe
-              curveType: 'function',
-              legend: { position: 'none' },
-              pointSize: 5 // Optionnel : ajouter des points sur la courbe
-            };
+                    // Créer un tableau de données Google Charts
+                    var dataTable = google.visualization.arrayToDataTable(dataArray);
 
-            // Dessiner le graphique sous forme de courbe
-            var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-            chart.draw(dataTable, options);
-          });
-      }
+                    // Définir les options du graphique
+                    var options = {
+                        title: 'Commits par minute',
+                        curveType: 'function',  // Utiliser une courbe pour relier les points
+                        legend: { position: 'bottom' }
+                    };
+
+                    // Créer le graphique dans l'élément HTML avec l'ID 'chart_div'
+                    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+                    chart.draw(dataTable, options); // Dessiner le graphique
+                })
+                .catch(error => console.error('Error fetching data:', error));  // Afficher une erreur en cas de problème
+        }
     </script>
-  </body>
-</html>
+</head>
+<body>
+    <h1>Graphique des Commits</h1>
 
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>  <!-- Zone pour afficher le graphique -->
+</body>
+</html>
