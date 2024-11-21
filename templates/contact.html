@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page de Contact</title>
+    <title>Nous Contacter</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,7 +43,7 @@
         .contact-form button {
             width: 100%;
             padding: 12px;
-            background-color: #4CAF50;
+            background-color: #007BFF;  /* Bleu */
             color: white;
             border: none;
             border-radius: 4px;
@@ -50,7 +51,7 @@
             cursor: pointer;
         }
         .contact-form button:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
         .contact-form .form-group {
             margin-bottom: 15px;
@@ -60,7 +61,7 @@
 <body>
 
     <div class="contact-form">
-        <h2>Contactez-nous</h2>
+        <h2>Nous contacter</h2>
         <form action="" method="POST">
             <div class="form-group">
                 <label for="first-name">Prénom</label>
@@ -71,8 +72,8 @@
                 <input type="text" id="last-name" name="last-name" placeholder="Votre nom" required>
             </div>
             <div class="form-group">
-                <label for="message">Message</label>
-                <textarea id="message" name="message" placeholder="Votre message..." required></textarea>
+                <label for="message">Message (max 250 caractères)</label>
+                <textarea id="message" name="message" placeholder="Votre message..." maxlength="250" required></textarea>
             </div>
             <button type="submit">Envoyer</button>
         </form>
@@ -80,3 +81,4 @@
 
 </body>
 </html>
+
