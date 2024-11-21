@@ -1,52 +1,63 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html>
+  <head>
+    <meta charset="UTF-8" />
     <title>Graphique des Commits</title>
-
-    <!-- Inclure la bibliothèque Google Charts -->
+    <!-- Charger la bibliothèque Google Charts -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        // Charger le package "corechart" et "line" de Google Charts
-        google.charts.load('current', {'packages':['corechart', 'line']});
+      google.charts.load("current", { packages: ["corechart"] });
+      google.charts.setOnLoadCallback(drawChart);
 
-        google.charts.setOnLoadCallback(drawChart); // Appeler la fonction drawChart une fois les bibliothèques chargées
+      function drawChart() {
+        // URL de l'API GitHub
+        const apiURL = "https://api.github.com/repos/oceaneesgi/5MCSI_Metriques/commits";
 
-        function drawChart() {
-            // Faire une requête pour récupérer les données des commits
-            fetch('/commits_data/')  // Nouvelle route qui renverra les données des commits
-                .then(response => response.json())  // Récupérer les données JSON
-                .then(data => {
-                    var dataArray = [];
-                    dataArray.push(['Minute', 'Nombre de Commits']); // Ajouter les en-têtes
+        // Récupération des données de l'API
+        fetch(apiURL)
+          .then((response) => response.json())
+          .then((commits) => {
+            // Transformer les données pour compter les commits par minute
+            const minuteCounts = {};
+            commits.forEach((commit) => {
+              const dateStr = commit.commit.author.date;
+              const dateObj = new Date(dateStr);
+              const minute = dateObj.getMinutes();
+              minuteCounts[minute] = (minuteCounts[minute] || 0) + 1;
+            });
 
-                    // Ajouter les données dans le tableau de manière itérative
-                    for (var minute in data) {
-                        dataArray.push([minute, data[minute]]);
-                    }
+            // Préparer les données pour Google Charts
+            const chartData = [["Minute", "Commits"]];
+            Object.keys(minuteCounts)
+              .sort((a, b) => a - b)
+              .forEach((minute) => {
+                chartData.push([minute.toString(), minuteCounts[minute]]);
+              });
 
-                    // Créer un tableau de données Google Charts
-                    var dataTable = google.visualization.arrayToDataTable(dataArray);
+            // Convertir les données en tableau Google Charts
+            const dataTable = google.visualization.arrayToDataTable(chartData);
 
-                    // Définir les options du graphique
-                    var options = {
-                        title: 'Commits par minute',
-                        curveType: 'function',  // Utiliser une courbe pour relier les points
-                        legend: { position: 'bottom' }
-                    };
+            // Options du graphique
+            const options = {
+              title: "Nombre de commits par minute",
+              hAxis: { title: "Minute" },
+              vAxis: { title: "Nombre de commits" },
+              legend: { position: "none" },
+            };
 
-                    // Créer le graphique dans l'élément HTML avec l'ID 'chart_div'
-                    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-                    chart.draw(dataTable, options); // Dessiner le graphique
-                })
-                .catch(error => console.error('Error fetching data:', error));  // Afficher une erreur en cas de problème
-        }
+            // Dessiner le graphique
+            const chart = new google.visualization.ColumnChart(
+              document.getElementById("chart_div")
+            );
+            chart.draw(dataTable, options);
+          })
+          .catch((error) => {
+            console.error("Erreur lors de la récupération des données : ", error);
+          });
+      }
     </script>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Graphique des Commits</h1>
-
-    <div id="chart_div" style="width: 900px; height: 500px;"></div>  <!-- Zone pour afficher le graphique -->
-</body>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+  </body>
 </html>
