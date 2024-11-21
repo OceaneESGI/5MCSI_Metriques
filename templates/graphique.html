@@ -38,3 +38,60 @@
     </script>
   </body>
 </html>
+
+
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Histogramme des températures</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <script>
+      google.charts.load("current", { packages: ["corechart"] });
+      google.charts.setOnLoadCallback(drawBackgroundColor);
+
+      function drawBackgroundColor() {
+        function drawChart(data) {
+          // Convertir les données récupérées en un tableau utilisable par Google Charts
+          var dataTable = new google.visualization.DataTable();
+          dataTable.addColumn("string", "Date");
+          dataTable.addColumn("number", "Température");
+
+          data.results.forEach(entry => {
+            var date = new Date(entry.timestamp * 1000); // Suppose que la clé est "timestamp"
+            dataTable.addRow([date.toLocaleDateString(), entry.temperature]); // Suppose que les clés sont "timestamp" et "temperature"
+          });
+
+          // Configurer les options du graphique à barres
+          var options = {
+            title: "Évolution des températures (API /historigramme/)",
+            legend: { position: "none" },
+            hAxis: {
+              title: "Date",
+              textStyle: { fontSize: 10 }
+            },
+            vAxis: {
+              title: "Température (°C)"
+            },
+            bar: { groupWidth: "75%" }
+          };
+
+          // Créer l'histogramme
+          var chart = new google.visualization.ColumnChart(document.getElementById("chart_div"));
+          chart.draw(dataTable, options);
+        }
+
+        // Récupération de données depuis l'API /historigramme/
+        fetch("/historigramme/")
+          .then(response => response.json())
+          .then(data => {
+            drawChart(data);
+          })
+          .catch(error => console.error("Erreur lors de la récupération des données :", error));
+      }
+    </script>
+  </body>
+</html>
+
